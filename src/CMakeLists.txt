@@ -37,6 +37,7 @@ endif()
 
 add_executable(opencl-lab
     main.cpp
+    config.cpp
     services/jacobi_runner.cpp
     services/jacobi_gpu_texture.cpp
     services/jacobi_gpu_global.cpp

@@ -1,3 +1,4 @@
+#include "config.h"
 #include "services/jacobi_benchmark.h"
 #include "services/jacobi_gpu_global.h"
 #include "services/jacobi_gpu_local.h"
@@ -6,11 +7,19 @@
 #include <spdlog/spdlog.h>
 #include <memory>
 
-int main()
+int main(int argc, char *argv[])
 {
-    // Configuration
-    uint32_t grid_size = 512;
-    uint32_t iterations = 100;
+    // Parse configuration from command line arguments
+    Config config(argc, argv);
+
+    if (config.is_help_requested())
+    {
+        Config::print_usage(argv[0]);
+        return 0;
+    }
+
+    uint32_t grid_size = config.get_grid_size();
+    uint32_t iterations = config.get_iterations();
 
     spdlog::info("========================================");
     spdlog::info("Jacobi Benchmark: Grid {}x{}, {} iterations",
