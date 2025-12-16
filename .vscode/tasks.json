@@ -18,9 +18,25 @@
             "problemMatcher": []
         },
         {
+            "label": "Build opencl-lab (Release)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/misc/build.sh",
+                "release",
+                "${workspaceFolder}/src"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Clean opencl-lab",
             "type": "shell",
-            "command": "rm -rf ${workspaceFolder}/src/build",
+            "command": "rm -rf ${workspaceFolder}/src/build/Debug ${workspaceFolder}/src/build/Release",
             "group": "build"
         }
     ]
