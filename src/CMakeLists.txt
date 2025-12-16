@@ -10,6 +10,8 @@ find_package(OpenCLHeadersCpp REQUIRED)
 find_package(OpenCLICDLoader REQUIRED)
 find_package(spdlog REQUIRED)
 
+add_compile_definitions(CL_HPP_TARGET_OPENCL_VERSION=300)
+
 add_executable(opencl-lab
     main.cpp
     services/jacobi_runner.cpp
