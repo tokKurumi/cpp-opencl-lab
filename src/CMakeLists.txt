@@ -10,7 +10,18 @@ find_package(OpenCLHeadersCpp REQUIRED)
 find_package(OpenCLICDLoader REQUIRED)
 find_package(spdlog REQUIRED)
 
-add_compile_definitions(CL_HPP_TARGET_OPENCL_VERSION=300)
+# macOS only supports OpenCL 1.2, Linux supports higher versions
+if(APPLE)
+    add_compile_definitions(
+        CL_HPP_TARGET_OPENCL_VERSION=120
+        CL_HPP_MINIMUM_OPENCL_VERSION=120
+    )
+else()
+    add_compile_definitions(
+        CL_HPP_TARGET_OPENCL_VERSION=300
+        CL_HPP_MINIMUM_OPENCL_VERSION=120
+    )
+endif()
 
 add_executable(opencl-lab
     main.cpp
