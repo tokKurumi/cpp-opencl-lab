@@ -1,6 +1,5 @@
 [requires]
-opencl-clhpp-headers/2023.12.14
-opencl-icd-loader/2023.12.14
+# macOS uses system OpenCL framework
 spdlog/1.16.0
 
 [generators]

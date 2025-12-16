@@ -6,29 +6,31 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Try to find OpenCL packages from Conan first
 find_package(OpenCLHeadersCpp QUIET)
 find_package(OpenCLICDLoader QUIET)
 find_package(spdlog REQUIRED)
 
-# If Conan packages not found (macOS), use system OpenCL
-if(NOT OpenCLHeadersCpp_FOUND OR NOT OpenCLICDLoader_FOUND)
-    find_package(OpenCL REQUIRED)
-    
-    # On macOS, use Homebrew headers for C++ API
-    if(APPLE)
-        set(OPENCL_HPP_INCLUDE_DIR "/opt/homebrew/opt/opencl-clhpp-headers/include")
-        add_compile_definitions(
-            CL_HPP_TARGET_OPENCL_VERSION=120
-            CL_HPP_MINIMUM_OPENCL_VERSION=120
-        )
-    endif()
-else()
-    # Using Conan packages (Linux/Windows)
+set(USE_CONAN_OPENCL ${OpenCLHeadersCpp_FOUND})
+
+# Set OpenCL version macros based on source
+if(USE_CONAN_OPENCL)
     add_compile_definitions(
         CL_HPP_TARGET_OPENCL_VERSION=300
         CL_HPP_MINIMUM_OPENCL_VERSION=120
     )
+else()
+    find_package(OpenCL REQUIRED)
+    if(APPLE)
+        add_compile_definitions(
+            CL_HPP_TARGET_OPENCL_VERSION=120
+            CL_HPP_MINIMUM_OPENCL_VERSION=120
+        )
+    else()
+        add_compile_definitions(
+            CL_HPP_TARGET_OPENCL_VERSION=300
+            CL_HPP_MINIMUM_OPENCL_VERSION=120
+        )
+    endif()
 endif()
 
 add_executable(opencl-lab
@@ -45,19 +47,20 @@ target_include_directories(opencl-lab PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-# Link libraries: use Conan packages if available, otherwise system OpenCL
-if(OpenCLHeadersCpp_FOUND AND OpenCLICDLoader_FOUND)
-    # Using Conan packages
+# macOS specific includes
+if(APPLE AND NOT USE_CONAN_OPENCL)
+    target_include_directories(opencl-lab PRIVATE 
+        /opt/homebrew/opt/opencl-clhpp-headers/include # Adjust path as necessary, now use homebrew
+    )
+endif()
+
+if(USE_CONAN_OPENCL)
     target_link_libraries(opencl-lab
         OpenCL::HeadersCpp
         OpenCL::OpenCL
         spdlog::spdlog
     )
 else()
-    # Using system OpenCL
-    if(APPLE AND OPENCL_HPP_INCLUDE_DIR)
-        target_include_directories(opencl-lab PRIVATE ${OPENCL_HPP_INCLUDE_DIR})
-    endif()
     target_link_libraries(opencl-lab
         OpenCL::OpenCL
         spdlog::spdlog

@@ -54,15 +54,16 @@ fi
 SRC_DIR="$(cd "${SRC_DIR_INPUT}" && pwd)"
 
 # Validate required files
-# Prefer conanfile.py over conanfile.txt for conditional dependencies
-CONANFILE="${SRC_DIR}/conanfile.py"
-if [[ ! -f "${CONANFILE}" ]]; then
-  CONANFILE="${SRC_DIR}/conanfile.txt"
+CONANFILE_TXT="${SRC_DIR}/conanfile.txt"
+CMAKELISTS_TXT="${SRC_DIR}/CMakeLists.txt"
+
+# Select appropriate conanfile based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  CONANFILE_TXT="${SRC_DIR}/conanfile.macos.txt"
 fi
 
-CMAKELISTS_TXT="${SRC_DIR}/CMakeLists.txt"
-if [[ ! -f "${CONANFILE}" ]]; then
-  err "Missing conanfile.py or conanfile.txt in ${SRC_DIR}"
+if [[ ! -f "${CONANFILE_TXT}" ]]; then
+  err "Missing conanfile.txt in ${SRC_DIR}"
   exit 5
 fi
 if [[ ! -f "${CMAKELISTS_TXT}" ]]; then
