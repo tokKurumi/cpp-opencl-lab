@@ -1,3 +1,10 @@
+#pragma once
+
+#include <string_view>
+
+namespace kernels
+{
+    constexpr std::string_view JACOBI_KERNELS = R"(
 __kernel void jacobi_texture(
     __read_only image2d_t input,
     __write_only image2d_t output,
@@ -98,3 +105,6 @@ __kernel void jacobi_local(
 
     output[y * grid_size + x] = (top + bottom + left + right) * 0.25f;
 }
+)";
+
+} // namespace kernels

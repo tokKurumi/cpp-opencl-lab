@@ -1,9 +1,8 @@
 #include "services/jacobi_gpu_texture.h"
+#include "services/kernels.h"
 
 #include <CL/opencl.hpp>
 #include <spdlog/spdlog.h>
-#include <fstream>
-#include <sstream>
 #include <chrono>
 
 class JacobiGpuTexture::Impl
@@ -78,15 +77,7 @@ public:
 
     std::string load_kernel_source()
     {
-        std::ifstream file("src/services/jacobi_kernels.cl");
-        if (!file.is_open())
-        {
-            spdlog::warn("jacobi_kernels.cl not found, using embedded kernel");
-            return "__kernel void jacobi_texture(__read_only image2d_t input, __write_only image2d_t output, uint grid_size) {}";
-        }
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        return buffer.str();
+        return std::string(kernels::JACOBI_KERNELS);
     }
 
     float *run()

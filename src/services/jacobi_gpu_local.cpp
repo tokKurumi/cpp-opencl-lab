@@ -1,9 +1,8 @@
 #include "services/jacobi_gpu_local.h"
+#include "services/kernels.h"
 
 #include <CL/opencl.hpp>
 #include <spdlog/spdlog.h>
-#include <fstream>
-#include <sstream>
 #include <chrono>
 
 class JacobiGpuLocal::Impl
@@ -85,57 +84,7 @@ public:
 
     std::string load_kernel_source()
     {
-        std::ifstream file("src/services/jacobi_kernels.cl");
-        if (!file.is_open())
-        {
-            spdlog::warn("JacobiGpuLocal: Could not open jacobi_kernels.cl, using embedded kernel");
-            return R"(
-__kernel void jacobi_local(
-    __global const float *input,
-    __global float *output,
-    uint grid_size,
-    __local float *local_data)
-{
-    int x = get_global_id(0);
-    int y = get_global_id(1);
-    int lx = get_local_id(0);
-    int ly = get_local_id(1);
-    int local_size_x = get_local_size(0);
-    int local_size_y = get_local_size(1);
-    
-    int local_idx = ly * (local_size_x + 2) + lx + 1;
-    local_data[local_idx] = input[y * grid_size + x];
-    
-    if (lx == 0 && x > 0)
-        local_data[ly * (local_size_x + 2)] = input[y * grid_size + (x - 1)];
-    if (lx == local_size_x - 1 && x < grid_size - 1)
-        local_data[ly * (local_size_x + 2) + local_size_x + 1] = input[y * grid_size + (x + 1)];
-    if (ly == 0 && y > 0)
-        local_data[lx + 1] = input[(y - 1) * grid_size + x];
-    if (ly == local_size_y - 1 && y < grid_size - 1)
-        local_data[(local_size_y + 1) * (local_size_x + 2) + lx + 1] = input[(y + 1) * grid_size + x];
-    
-    barrier(CLK_LOCAL_MEM_FENCE);
-    
-    if (x == 0 || x == grid_size - 1 || y == 0 || y == grid_size - 1)
-    {
-        output[y * grid_size + x] = 1.0f;
-        return;
-    }
-    
-    float top = local_data[(ly) * (local_size_x + 2) + lx + 1];
-    float bottom = local_data[(ly + 2) * (local_size_x + 2) + lx + 1];
-    float left = local_data[(ly + 1) * (local_size_x + 2) + lx];
-    float right = local_data[(ly + 1) * (local_size_x + 2) + lx + 2];
-    
-    output[y * grid_size + x] = (top + bottom + left + right) * 0.25f;
-}
-)";
-        }
-
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        return buffer.str();
+        return std::string(kernels::JACOBI_KERNELS);
     }
 
     float *run()
