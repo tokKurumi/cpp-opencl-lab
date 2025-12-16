@@ -35,7 +35,7 @@ fi
 BUILD_TYPE_RAW="$1"; shift
 SRC_DIR_INPUT="$1"; shift || true
 
-BUILD_TYPE_LC="${BUILD_TYPE_RAW,,}"
+BUILD_TYPE_LC="$(printf '%s' "${BUILD_TYPE_RAW}" | tr '[:upper:]' '[:lower:]')"
 case "${BUILD_TYPE_LC}" in
   debug)   CMAKE_BUILD_TYPE="Debug" ;;
   release) CMAKE_BUILD_TYPE="Release" ;;
@@ -72,6 +72,15 @@ mkdir -p "${BUILD_DIR}"
 # Detect Conan profile (idempotent)
 conan profile detect --force >/dev/null 2>&1 || true
 
+# Determine the correct libcxx setting based on OS
+# macOS uses libc++, Linux typically uses libstdc++ or libstdc++11
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  LIBCXX_SETTING="libc++"
+else
+  # For Linux and other Unix-like systems, prefer libstdc++11
+  LIBCXX_SETTING="libstdc++11"
+fi
+
 # Install Conan dependencies
 # Run conan install with cmake_layout from conanfile.txt.
 # The cmake_layout directive automatically creates: build/${CMAKE_BUILD_TYPE}/generators/
@@ -79,7 +88,7 @@ conan profile detect --force >/dev/null 2>&1 || true
 info "Installing Conan dependencies (type=${CMAKE_BUILD_TYPE})..."
 conan install "${SRC_DIR}" \
   --build=missing \
-  -s compiler.libcxx=libstdc++11 \
+  -s compiler.libcxx="${LIBCXX_SETTING}" \
   -s build_type="${CMAKE_BUILD_TYPE}" \
   -g CMakeToolchain \
   -g CMakeDeps
