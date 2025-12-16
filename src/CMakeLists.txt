@@ -6,11 +6,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Boost REQUIRED)
+find_package(OpenCLHeadersCpp REQUIRED)
+find_package(OpenCLICDLoader REQUIRED)
+find_package(spdlog REQUIRED)
 
 add_executable(opencl-lab
     main.cpp
-    services/print_service.cpp
+    services/jacobi_runner.cpp
+    services/jacobi_gpu_texture.cpp
+    services/jacobi_gpu_global.cpp
+    services/jacobi_gpu_local.cpp
+    services/jacobi_benchmark.cpp
 )
 
 target_include_directories(opencl-lab PUBLIC
@@ -19,5 +25,7 @@ target_include_directories(opencl-lab PUBLIC
 )
 
 target_link_libraries(opencl-lab
-    boost::boost
+    OpenCL::HeadersCpp
+    OpenCL::OpenCL
+    spdlog::spdlog
 )
