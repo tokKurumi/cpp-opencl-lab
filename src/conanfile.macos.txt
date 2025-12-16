@@ -1,0 +1,10 @@
+[requires]
+# macOS uses system OpenCL framework
+spdlog/1.16.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

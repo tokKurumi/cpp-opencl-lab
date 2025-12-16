@@ -56,8 +56,14 @@ SRC_DIR="$(cd "${SRC_DIR_INPUT}" && pwd)"
 # Validate required files
 CONANFILE_TXT="${SRC_DIR}/conanfile.txt"
 CMAKELISTS_TXT="${SRC_DIR}/CMakeLists.txt"
+
+# Select appropriate conanfile based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  CONANFILE_TXT="${SRC_DIR}/conanfile.macos.txt"
+fi
+
 if [[ ! -f "${CONANFILE_TXT}" ]]; then
-  err "Missing conanfile.txt in ${SRC_DIR}"
+  err "Missing $(basename "${CONANFILE_TXT}") in ${SRC_DIR}"
   exit 5
 fi
 if [[ ! -f "${CMAKELISTS_TXT}" ]]; then
@@ -86,7 +92,7 @@ fi
 # The cmake_layout directive automatically creates: build/${CMAKE_BUILD_TYPE}/generators/
 # We pass the source directory explicitly to avoid changing working directory.
 info "Installing Conan dependencies (type=${CMAKE_BUILD_TYPE})..."
-conan install "${SRC_DIR}" \
+conan install "${CONANFILE_TXT}" \
   --build=missing \
   -s compiler.libcxx="${LIBCXX_SETTING}" \
   -s build_type="${CMAKE_BUILD_TYPE}" \
