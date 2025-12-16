@@ -1,4 +1,0 @@
-services:
-  opencl-lab:
-    build: ./src
-    container_name: opencl_lab
