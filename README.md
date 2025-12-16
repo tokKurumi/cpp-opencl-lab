@@ -1,4 +1,20 @@
-# NVIDIA GeForce RTX 3060
+# Requirements
+
+## Arch Linux (NVIDIA GPU)
+
+main opencl packages:
+
+```bash
+pacman -Q | grep -E "opencl|ocl|pocl"
+```
+
+```txt
+ocl-icd 2.3.4-1
+opencl-nvidia 580.105.08-5
+pocl 7.1-3
+```
+
+# NVIDIA GeForce RTX 3060 test results
 
 ```bash
 nvidia-smi
