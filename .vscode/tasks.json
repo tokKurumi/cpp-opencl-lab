@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build opencl-lab (Debug)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/misc/build.sh",
+                "debug",
+                "${workspaceFolder}/src"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean opencl-lab",
+            "type": "shell",
+            "command": "rm -rf ${workspaceFolder}/src/build",
+            "group": "build"
+        }
+    ]
+}
