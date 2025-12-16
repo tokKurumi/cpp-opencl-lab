@@ -35,7 +35,7 @@ fi
 BUILD_TYPE_RAW="$1"; shift
 SRC_DIR_INPUT="$1"; shift || true
 
-BUILD_TYPE_LC="${BUILD_TYPE_RAW,,}"
+BUILD_TYPE_LC="$(printf '%s' "${BUILD_TYPE_RAW}" | tr '[:upper:]' '[:lower:]')"
 case "${BUILD_TYPE_LC}" in
   debug)   CMAKE_BUILD_TYPE="Debug" ;;
   release) CMAKE_BUILD_TYPE="Release" ;;
@@ -79,7 +79,7 @@ conan profile detect --force >/dev/null 2>&1 || true
 info "Installing Conan dependencies (type=${CMAKE_BUILD_TYPE})..."
 conan install "${SRC_DIR}" \
   --build=missing \
-  -s compiler.libcxx=libstdc++11 \
+  -s compiler.libcxx=libc++ \
   -s build_type="${CMAKE_BUILD_TYPE}" \
   -g CMakeToolchain \
   -g CMakeDeps
