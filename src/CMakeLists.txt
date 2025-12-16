@@ -12,20 +12,22 @@ find_package(spdlog REQUIRED)
 
 set(USE_CONAN_OPENCL ${OpenCLHeadersCpp_FOUND})
 
-# Set OpenCL version macros based on source
-if(USE_CONAN_OPENCL)
+# Always cap OpenCL C++ headers to 1.2 on macOS (Apple provides OpenCL 1.2)
+if(APPLE)
+    find_package(OpenCL REQUIRED)
     add_compile_definitions(
-        CL_HPP_TARGET_OPENCL_VERSION=300
+        CL_HPP_TARGET_OPENCL_VERSION=120
         CL_HPP_MINIMUM_OPENCL_VERSION=120
     )
 else()
-    find_package(OpenCL REQUIRED)
-    if(APPLE)
+    # On non-Apple, prefer Conan-provided headers/loader with OpenCL 3.0 API
+    if(USE_CONAN_OPENCL)
         add_compile_definitions(
-            CL_HPP_TARGET_OPENCL_VERSION=120
+            CL_HPP_TARGET_OPENCL_VERSION=300
             CL_HPP_MINIMUM_OPENCL_VERSION=120
         )
     else()
+        find_package(OpenCL REQUIRED)
         add_compile_definitions(
             CL_HPP_TARGET_OPENCL_VERSION=300
             CL_HPP_MINIMUM_OPENCL_VERSION=120
